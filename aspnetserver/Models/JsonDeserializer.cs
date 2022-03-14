@@ -1,51 +1,23 @@
-﻿using DownloadCards.Models;
-using DownloadCards.Models.Finishes;
-using DownloadCards.Models.Images;
-using DownloadCards.Models.Prices.Cards;
-using System;
-using System.Collections.Generic;
+﻿using aspnetserver.Models.Finishes;
+using aspnetserver.Models.Images;
+using aspnetserver.Models.Prices.Cards;
+using aspnetserver.Scryfall;
 using System.Globalization;
-using System.IO;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace DownloadCards
+namespace aspnetserver.Models
 {
-
-    class Program
+    internal static class JsonDeserializer
     {
-        private static readonly HttpClient client = new();
-        private static readonly string fileName = $"{Environment.CurrentDirectory}\\{DateTime.Now.Day}{DateTime.Now.Month}{DateTime.Now.Year}.json";
-        private const string Seed = "922022.json";
+        private static readonly string Seed = @"D:\ScryfallJsons\922022.json";
 
-        static async Task Main()
+        public static Data? Deserialize()
         {
-            //await Download();
-            //await Deserialize();
-            var finishes = new List<CardFinish>();
-            var foilFinish = new FoilFinish();
-            finishes.Add(foilFinish);
-            var finish = finishes[0];
-            if (finish is FoilFinish f)
-                Console.WriteLine($"Yea boi {f}");
-        }
-
-        private static async Task<Data> Deserialize()
-        {
-            IList<CardJson> allCards = null;
+            IList<CardJson>? allCards = null;
             int cardId, priceEurId, priceEurFoilId, priceUsdId, priceUsdFoilId, priceUsdEtchedId, priceUsdGlossyId, foilId, etchedId, glossyId, frontFaceId, backFaceId;
             cardId = priceEurId = priceEurFoilId = priceUsdId = priceUsdFoilId = priceUsdEtchedId = priceUsdGlossyId = foilId = etchedId = glossyId = frontFaceId = backFaceId = 0;
             var data = new Data();
-            try
-            {
-                allCards = await JsonSerializer.DeserializeAsync<IList<CardJson>>(File.OpenRead(Seed));
-            }
-            catch (Exception e)
-            {
-                var file = File.CreateText("log.txt");
-                file.WriteLine(e.ToString());
-            }
+            allCards = JsonSerializer.Deserialize<IList<CardJson>>(File.OpenRead(Seed));
             if (allCards == null)
                 return null;
 
@@ -57,7 +29,7 @@ namespace DownloadCards
                 cardId += 1;
                 data.Cards.Add(new Card
                 {
-                    CardId = cardId,
+                    Id = cardId,
                     Name = card.Name,
                     Set = card.Set,
                     CollectorNumber = card.CollectorNumber,
@@ -68,7 +40,7 @@ namespace DownloadCards
                 {
                     data.FrontFaces.Add(new FrontFace
                     {
-                        ImageId = frontFaceId,
+                        Id = frontFaceId,
                         CardId = cardId,
                         UriLarge = card.ImageUri.Large,
                         UriNormal = card.ImageUri.Normal,
@@ -80,7 +52,7 @@ namespace DownloadCards
                     backFaceId += 1;
                     data.FrontFaces.Add(new FrontFace
                     {
-                        ImageId = frontFaceId,
+                        Id = frontFaceId,
                         CardId = cardId,
                         UriLarge = card.CardFaces[0].ImageUri.Large,
                         UriNormal = card.CardFaces[0].ImageUri.Normal,
@@ -88,7 +60,7 @@ namespace DownloadCards
                     });
                     data.BackFaces.Add(new BackFace
                     {
-                        ImageId = backFaceId,
+                        Id = backFaceId,
                         CardId = cardId,
                         UriLarge = card.CardFaces[1].ImageUri.Large,
                         UriNormal = card.CardFaces[1].ImageUri.Normal,
@@ -102,25 +74,16 @@ namespace DownloadCards
                     {
                         case "foil":
                             foilId += 1;
-                            data.FoilFinishes.Add(new FoilFinish
-                            {
-                                CardId = cardId,
-                                FinishId = foilId
-                            }); break;
+                            data.FoilFinishes.Add(new FoilFinish{ CardId = cardId, Id = foilId });
+                            break;
                         case "etched":
                             etchedId += 1;
-                            data.EtchedFinishes.Add(new EtchedFinish
-                            {
-                                CardId = cardId,
-                                FinishId = etchedId
-                            }); break;
+                            data.EtchedFinishes.Add(new EtchedFinish{ CardId = cardId, Id = etchedId });
+                            break;
                         case "glossy":
                             glossyId += 1;
-                            data.GlossyFinishes.Add(new GlossyFinish
-                            {
-                                CardId = cardId,
-                                FinishId = glossyId
-                            }); break;
+                            data.GlossyFinishes.Add(new GlossyFinish{ CardId = cardId, Id = glossyId });
+                            break;
                     }
                 }
 
@@ -130,7 +93,7 @@ namespace DownloadCards
                     data.CardPricesEur.Add(new CardPriceEur
                     {
                         CardId = cardId,
-                        PriceId = priceEurId,
+                        Id = priceEurId,
                         Price = double.Parse(card.Price.Eur, CultureInfo.InvariantCulture)
                     });
                 }
@@ -141,7 +104,7 @@ namespace DownloadCards
                     data.CardPricesEurFoil.Add(new CardPriceEurFoil
                     {
                         CardId = cardId,
-                        PriceId = priceEurFoilId,
+                        Id = priceEurFoilId,
                         Price = double.Parse(card.Price.EurFoil, CultureInfo.InvariantCulture)
                     });
                 }
@@ -152,7 +115,7 @@ namespace DownloadCards
                     data.CardPricesUsd.Add(new CardPriceUsd
                     {
                         CardId = cardId,
-                        PriceId = priceUsdId,
+                        Id = priceUsdId,
                         Price = double.Parse(card.Price.Usd, CultureInfo.InvariantCulture)
                     });
                 }
@@ -163,7 +126,7 @@ namespace DownloadCards
                     data.CardPricesUsdFoil.Add(new CardPriceUsdFoil
                     {
                         CardId = cardId,
-                        PriceId = priceUsdFoilId,
+                        Id = priceUsdFoilId,
                         Price = double.Parse(card.Price.UsdFoil, CultureInfo.InvariantCulture)
                     });
                 }
@@ -174,7 +137,7 @@ namespace DownloadCards
                     data.CardPricesUsdEtched.Add(new CardPriceUsdEtched
                     {
                         CardId = cardId,
-                        PriceId = priceUsdEtchedId,
+                        Id = priceUsdEtchedId,
                         Price = double.Parse(card.Price.UsdEtched, CultureInfo.InvariantCulture)
                     });
                 }
@@ -185,37 +148,12 @@ namespace DownloadCards
                     data.CardPricesUsdGlossy.Add(new CardPriceUsdGlossy
                     {
                         CardId = cardId,
-                        PriceId = priceUsdGlossyId,
+                        Id = priceUsdGlossyId,
                         Price = double.Parse(card.Price.UsdGlossy, CultureInfo.InvariantCulture)
                     });
                 }
             }
             return data;
-        }
-
-        /// <summary>
-        /// Sometimes fails to downlaod all the cards
-        /// </summary>
-        private static async Task Download()
-        {
-            if (File.Exists(fileName)) { 
-                Console.WriteLine($"{fileName} was already found. Download skipped");
-                return;
-            }
-
-            try
-            {
-                var streamTask = client.GetStreamAsync("https://api.scryfall.com/bulk-data");
-                var bulk = await JsonSerializer.DeserializeAsync<BulkFiles>(await streamTask);
-                var cardStream = await client.GetStreamAsync(bulk.GetDownloadUrl());
-                using var fileStream = File.Create(fileName);
-                cardStream.CopyTo(fileStream);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            Console.WriteLine("Download done");
         }
     }
 }

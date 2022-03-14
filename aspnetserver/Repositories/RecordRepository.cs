@@ -3,19 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace aspnetserver.Data
 {
-    internal static class RecordsRepository
+    internal static class RecordRepository
     {
-        internal async static Task<List<Record>> GetRecordsAsync()
+        internal async static Task<List<Record>> GetRecordAsync()
         {
             using var db = new AppDbContext();
-            return await db.Records.ToListAsync();
+            return await db.Record.ToListAsync();
         }
 
         internal async static Task<Record> GetRecordByIdAsync(int recordId)
         {
             using var db = new AppDbContext();
-            return await db.Records
-                .FirstOrDefaultAsync(record => record.RecordId == recordId);
+            return await db.Record
+                .FirstOrDefaultAsync(record => record.Id == recordId);
         }
 
         internal async static Task<bool> CreateRecordAsync(Record record)
@@ -23,7 +23,7 @@ namespace aspnetserver.Data
             using var db = new AppDbContext();
             try
             {
-                await db.Records.AddAsync(record);
+                await db.Record.AddAsync(record);
                 return await db.SaveChangesAsync() >= 1;
             }
             catch (Exception)
@@ -37,7 +37,7 @@ namespace aspnetserver.Data
             using var db = new AppDbContext();
             try
             {
-                db.Records.Update(record);
+                db.Record.Update(record);
                 return await db.SaveChangesAsync() >= 1;
             }
             catch (Exception)

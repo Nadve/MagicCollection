@@ -1,13 +1,23 @@
-﻿namespace aspnetserver.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace aspnetserver.Models
 {
     internal class Card
     {
-        public int CardId { get; set; }
+        public int Id { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Name { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Set { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string CollectorNumber { get; set; }
 
-        public virtual ICollection<Record> Records { get; set; }
-        public virtual ICollection<Possession> Possessions { get; set; }
+        public List<Record> Records { get; set; }
     }
 }

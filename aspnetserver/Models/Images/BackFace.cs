@@ -1,4 +1,4 @@
-﻿namespace aspnetserver.Models.Finishes
+﻿namespace aspnetserver.Models.Images
 {
     internal class BackFace : CardImage
     {

@@ -1,4 +1,5 @@
 ﻿using aspnetserver.Models.Finishes;
+using aspnetserver.Models.Images;
 using aspnetserver.Models.Prices.Cards;
 
 namespace aspnetserver.Models

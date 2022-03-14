@@ -1,5 +1,5 @@
-using aspnetserver.Data;
 using aspnetserver.Models;
+using aspnetserver.Repositories;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,12 +28,12 @@ app.UseSwaggerUI(swaggerUIOptions =>
 
 app.UseHttpsRedirection();
 
-app.MapGet("/get-all-users", async () => await UsersRepository.GetUsersAsync())
+app.MapGet("/get-all-users", async () => await UserRepository.GetUsersAsync())
     .WithTags("Users Endpoints");
 
 app.MapGet("/get-user-by-id/{userId}", async (int userId) =>
 {
-    var user = await UsersRepository.GetUserByIdAsync(userId);
+    var user = await UserRepository.GetUserByIdAsync(userId);
     return user != null
         ? Results.Ok(user)
         : Results.BadRequest();
@@ -41,23 +41,26 @@ app.MapGet("/get-user-by-id/{userId}", async (int userId) =>
 
 app.MapPost("/create-user", async (User user) =>
 {
-    return await UsersRepository.CreateUserAsync(user)
+    return await UserRepository.CreateUserAsync(user)
         ? Results.Ok("Create successful")
         : Results.BadRequest();
 }).WithTags("Users Endpoints");
 
 app.MapPut("/update-user", async (User user) =>
 {
-    return await UsersRepository.UpdateUserAsync(user)
+    return await UserRepository.UpdateUserAsync(user)
         ? Results.Ok("Update successful")
         : Results.BadRequest();
 }).WithTags("Users Endpoints");
 
 app.MapDelete("/delete-user/{userId}", async (int userId) =>
 {
-    return await UsersRepository.DeleteUserAsync(userId)
+    return await UserRepository.DeleteUserAsync(userId)
         ? Results.Ok("Deletion successful")
         : Results.BadRequest();
 }).WithTags("Users Endpoints");
 
+var data = JsonDeserializer.Deserialize();
+await FinishRepository.SyncFinishes(data);
+await ImageRepository.SyncImages(data);
 app.Run();

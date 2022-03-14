@@ -1,10 +1,15 @@
-﻿namespace aspnetserver.Models.Prices.Cards
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace aspnetserver.Models.Prices.Cards
 {
-    internal class CardPrice
+    internal abstract class CardPrice
     {
-        public int PriceId { get; set; }
+        public int Id { get; set; }
+        
+        [Required]
+        public double Price { get; set; }
+
         public Card Card { get; set; }
         public int CardId { get; set; }
-        public double Price { get; set; }
     }
 }

@@ -1,21 +1,22 @@
-﻿using aspnetserver.Models;
+﻿using aspnetserver.Data;
+using aspnetserver.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace aspnetserver.Data
+namespace aspnetserver.Repositories
 {
-    internal static class UsersRepository
+    internal static class UserRepository
     {
         internal async static Task<List<User>> GetUsersAsync()
         {
             using var db = new AppDbContext();
-            return await db.Users.ToListAsync();
+            return await db.User.ToListAsync();
         }
 
         internal async static Task<User> GetUserByIdAsync(int userId)
         {
             using var db = new AppDbContext();
-            return await db.Users
-                .FirstOrDefaultAsync(user => user.UserId == userId);
+            return await db.User
+                .FirstOrDefaultAsync(user => user.Id == userId);
         }
 
         internal async static Task<bool> CreateUserAsync(User user)
@@ -23,7 +24,7 @@ namespace aspnetserver.Data
             using var db = new AppDbContext();
             try
             {
-                await db.Users.AddAsync(user);
+                await db.User.AddAsync(user);
                 return await db.SaveChangesAsync() >= 1;
             }
             catch (Exception)
@@ -37,7 +38,7 @@ namespace aspnetserver.Data
             using var db = new AppDbContext();
             try
             {
-                db.Users.Update(user);
+                db.User.Update(user);
                 return await db.SaveChangesAsync() >= 1;
             }
             catch (Exception)

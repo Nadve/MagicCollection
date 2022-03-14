@@ -1,10 +1,15 @@
-﻿namespace aspnetserver.Models.Prices.Records
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace aspnetserver.Models.Prices.Records
 {
-    internal class RecordPrice
+    internal abstract class RecordPrice
     {
-        public int PriceId { get; set; }
+        public int Id { get; set; }
+
+        [Required]
+        public double Price { get; set; }
+
         public Card Record { get; set; }
         public int RecordId { get; set; }
-        public double Price { get; set; }
     }
 }
